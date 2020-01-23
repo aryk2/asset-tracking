@@ -40,6 +40,7 @@ export default class AddEmployee extends React.Component {
             date: null,
             accessories: null,
             array: [],
+            index: null,
         };
 
     }
@@ -56,6 +57,24 @@ export default class AddEmployee extends React.Component {
         }).then((response) => {
             let result = response.result;
             console.log(`${result.updates.updatedCells} cells appended.`)
+        });
+        return new Promise(resolve => {
+            resolve(true);
+        })
+    }
+
+    removeRow(values, range, inputOption) {
+        let body = {
+            values: values
+        };
+        window.gapi.client.sheets.spreadsheets.values.update({
+            spreadsheetId: SHEETID,
+            range: range,
+            valueInputOption: inputOption,
+            resource: body
+        }).then((response) => {
+            let result = response.result;
+            console.log(`${result.updatedCells} cells updated.`);
         });
     }
 
@@ -75,8 +94,10 @@ export default class AddEmployee extends React.Component {
                 if (range.values.length > 0) {
                     for (let i = 0; i < range.values.length; i++) {
                         let row = range.values[i];
-                        let temp = {SN: row[0], model: row[1], memory: row[3], storage: row[4]};
-                        list.push(temp);
+                        if(row[0]) {
+                            let temp = {SN: row[0], model: row[1], memory: row[3], storage: row[4], index: i};
+                            list.push(temp);
+                        }
                     }
                 }
             });
@@ -93,17 +114,37 @@ export default class AddEmployee extends React.Component {
             if (sn === this.state.array[i].SN)
                 x = this.state.array[i]
         }
-        this.setState({SN: sn, model: x.model, memory: x.memory, storage: x.storage});
+        this.setState({SN: sn, model: x.model, memory: x.memory, storage: x.storage, index: x.index + 2});
     };
 
-    submit() {
+    async submit() {
         let values = [
             [
                 this.state.SN, this.state.name, this.state.date,
                 this.state.model, this.state.memory, this.state.storage
             ]
         ];
-        this.appendUser(values, 'Current Employees!A2:F', 'USER_ENTERED')
+        await this.appendUser(values, 'Current Employees!A2:F', 'USER_ENTERED');
+        if(this.state.model && (String(this.state.model).includes("mac") || String(this.state.model).includes("Mac"))) {
+            values = [
+                [
+                    "", "", "", "", "", "", "", ""
+                ],
+            ];
+            let range = 'spare macs!A' + this.state.index + ':H' + this.state.index;
+
+            this.removeRow(values, range, 'USER_ENTERED')
+        }
+        else {
+            values = [
+                [
+                    "", "", "", "", "", "", "", ""
+                ],
+            ];
+            let range = 'spare windows!A' + this.state.index + ':H' + this.state.index;
+
+            this.removeRow(values, range, 'USER_ENTERED')
+        }
     }
 
     render() {

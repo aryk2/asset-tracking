@@ -4,12 +4,14 @@ import {componentDidMount, loadSheetsAPI} from "../helpers/google-auth";
 import AddComputer from "./addComputer";
 import AddEmployee from "./newEmployee";
 import RemoveEmployee from "./removeEmployee";
+import Repair from "./repair"
 import Button from '@material-ui/core/Button';
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
+
 
 
 
@@ -86,6 +88,7 @@ export default class MainPage extends React.Component {
                             <MenuItem value="new-computer">Register New Computer</MenuItem>
                             <MenuItem value="add-employee">Add a New Employee</MenuItem>
                             <MenuItem value="remove-employee">Remove an Employee</MenuItem>
+                            <MenuItem value="repair">Repair Computer</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
@@ -106,6 +109,13 @@ export default class MainPage extends React.Component {
                 {((this.state.option === "remove-employee") ?
                         <Grid container justify={"center"}>
                             <RemoveEmployee/>
+                        </Grid>
+                        :
+                        null
+                )}
+                {((this.state.option === "repair") ?
+                        <Grid container justify={"center"}>
+                            <Repair/>
                         </Grid>
                         :
                         null
